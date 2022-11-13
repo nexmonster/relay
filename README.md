@@ -37,4 +37,12 @@ If nftables aren't supported on your devices, you can also use `iptables`. Iptab
 iptables -t mangle -A INPUT -i wlan0 -p udp -s 10.10.10.10 -d 255.255.255.255 --dport 5500 --sport 5500 -j TEE --gateway 10.20.30.207 IP-desktop
 ```
 
+#### More Resources
+
+- https://serverfault.com/questions/1115546/forward-udp-broadcasts-to-another-ip/1115550#1115550
+- https://github.com/nomeata/udp-broadcast-relay
+- https://github.com/udp-redux/udp-broadcast-relay-redux
+- https://github.com/udp-redux/udp-broadcast-relay-redux/issues/12
+- https://github.com/udp-redux/udp-broadcast-relay-redux/issues/13
+
 
