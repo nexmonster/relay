@@ -37,6 +37,31 @@ If nftables aren't supported on your devices, you can also use `iptables`. Iptab
 iptables -t mangle -A INPUT -i wlan0 -p udp -s 10.10.10.10 -d 255.255.255.255 --dport 5500 --sport 5500 -j TEE --gateway 10.20.30.207 IP-desktop
 ```
 
+#### Advanced usage
+
+The default destination address of packets is `255.255.255.255` (broadcast), which makes some routers not forward packets. You can mangle the IP and UDP headers to change these:
+
+```bash
+
+nft add table ip nexmoncsi
+
+nft 'add chain ip nexmoncsi input { type filter hook input priority -150; policy accept; }'
+
+nft add rule ip nexmoncsi input iifname "wlan0" ip protocol udp ip saddr 10.10.10.10 ip daddr 255.255.255.255 udp sport 5500 udp dport 5500 counter mark set 900 dup to IP-WHERE-YOU-RECEIVE device "eth0"
+
+nft 'add chain ip nexmoncsi output { type filter hook output priority 150; policy accept; }'
+
+nft add rule ip nexmoncsi output oifname "eth0" meta mark 900 counter ip saddr set 10.10.10.1 udp sport set 5500 # many mangling opportunities here
+
+# ip saddr set 10.10.10.1 ; sets source address to 10.10.10.1
+# ip daddr set 10.20.30.1 ; sets destination address to 10.20.30.1
+# udp sport set 5400      ; sets UDP source port to 5400
+# udp dport set 5600      ; sets UDP destination port to 5600
+
+# Setting daddr here won't send it to a different device. You have to set the ip where you'd like to receive in the 3rd line.
+
+```
+
 #### More Resources
 
 - https://serverfault.com/questions/1115546/forward-udp-broadcasts-to-another-ip/1115550#1115550
